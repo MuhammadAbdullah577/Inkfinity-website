@@ -120,10 +120,10 @@ export default function TrendingProducts() {
                 slidesPerView: 4,
               },
             }}
-            className="!pb-12"
+            className="!pb-12 [&>.swiper-wrapper]:items-stretch"
           >
             {products.map((product) => (
-              <SwiperSlide key={product.id}>
+              <SwiperSlide key={product.id} className="!h-auto">
                 <ProductCard product={product} />
               </SwiperSlide>
             ))}
@@ -148,7 +148,7 @@ function ProductCard({ product }) {
     : '/placeholder-product.jpg'
 
   return (
-    <div className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
+    <div className="group h-full flex flex-col bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img
@@ -179,17 +179,15 @@ function ProductCard({ product }) {
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 flex-1 flex flex-col">
         <Link to={`/products/${product.id}`}>
-          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
             {product.name}
           </h3>
         </Link>
-        {product.description && (
-          <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-            {product.description}
-          </p>
-        )}
+        <p className="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">
+          {product.description || '\u00A0'}
+        </p>
       </div>
     </div>
   )
