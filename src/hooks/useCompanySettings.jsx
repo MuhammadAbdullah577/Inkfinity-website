@@ -17,6 +17,7 @@ const defaultSettings = {
 
   // Branding
   logo: null,
+  logo_dark: null,
   favicon: null,
 
   // Social Media
@@ -99,7 +100,7 @@ function useCompanySettingsInternal() {
     fetchSettings()
   }, [fetchSettings])
 
-  const updateSettings = async (newSettings, logoFile = null, faviconFile = null) => {
+  const updateSettings = async (newSettings, logoFile = null, faviconFile = null, logoDarkFile = null) => {
     try {
       let updateData = { ...newSettings }
 
@@ -112,6 +113,17 @@ function useCompanySettingsInternal() {
         const { fileName, error: uploadError } = await uploadImage(logoFile, 'product-images', 'branding')
         if (uploadError) throw uploadError
         updateData.logo = fileName
+      }
+
+      // Handle dark logo upload
+      if (logoDarkFile) {
+        // Delete old dark logo if exists
+        if (settings.logo_dark) {
+          await deleteImage(settings.logo_dark)
+        }
+        const { fileName, error: uploadError } = await uploadImage(logoDarkFile, 'product-images', 'branding')
+        if (uploadError) throw uploadError
+        updateData.logo_dark = fileName
       }
 
       // Handle favicon upload
@@ -211,6 +223,32 @@ function useCompanySettingsInternal() {
     }
   }
 
+  const removeDarkLogo = async () => {
+    try {
+      if (settings.logo_dark) {
+        await deleteImage(settings.logo_dark)
+      }
+
+      const { data: existing } = await supabase
+        .from('company_settings')
+        .select('id')
+        .single()
+
+      if (existing) {
+        await supabase
+          .from('company_settings')
+          .update({ logo_dark: null })
+          .eq('id', existing.id)
+      }
+
+      setSettings(prev => ({ ...prev, logo_dark: null }))
+      return { error: null }
+    } catch (err) {
+      console.error('Error removing dark logo:', err)
+      return { error: err }
+    }
+  }
+
   return {
     settings,
     loading,
@@ -218,6 +256,7 @@ function useCompanySettingsInternal() {
     fetchSettings,
     updateSettings,
     removeLogo,
+    removeDarkLogo,
     removeFavicon,
     getImageUrl,
     defaultSettings,

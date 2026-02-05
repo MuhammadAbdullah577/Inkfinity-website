@@ -10,13 +10,15 @@ import {
   Settings,
   Menu,
   X,
-  ChevronLeft
+  ChevronLeft,
+  TrendingUp
 } from 'lucide-react'
 
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
   { name: 'Categories', path: '/admin/categories', icon: FolderTree },
   { name: 'Products', path: '/admin/products', icon: Package },
+  { name: 'Trending', path: '/admin/trending', icon: TrendingUp },
   { name: 'Blog Posts', path: '/admin/blog', icon: FileText },
   { name: 'Inquiries', path: '/admin/inquiries', icon: MessageSquare },
   { name: 'Settings', path: '/admin/settings', icon: Settings },

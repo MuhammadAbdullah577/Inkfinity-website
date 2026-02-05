@@ -32,22 +32,19 @@ export default function MobileMenu({ isOpen, onClose, links }) {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
-              <div className="flex items-center gap-2">
-                {settings.logo ? (
-                  <img
-                    src={getImageUrl(settings.logo)}
-                    alt={settings.company_name}
-                    className="w-8 h-8 rounded-lg object-contain"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                    <span className="text-white font-bold">
-                      {settings.company_short_name?.charAt(0) || 'I'}
-                    </span>
-                  </div>
-                )}
-                <span className="font-bold text-gray-900">{settings.company_short_name}</span>
-              </div>
+              {settings.logo ? (
+                <img
+                  src={getImageUrl(settings.logo)}
+                  alt={settings.company_name}
+                  className="h-12 w-auto object-contain"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                  <span className="text-white font-bold text-2xl">
+                    {settings.company_short_name?.charAt(0) || 'I'}
+                  </span>
+                </div>
+              )}
               <button
                 onClick={onClose}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

@@ -25,23 +25,20 @@ export default function Header() {
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 shrink-0">
+            <Link to="/" className="shrink-0">
               {settings.logo ? (
                 <img
                   src={getImageUrl(settings.logo)}
                   alt={settings.company_name}
-                  className="w-10 h-10 rounded-xl object-contain"
+                  className="h-16 w-auto object-contain"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                  <span className="text-white font-bold text-3xl">
                     {settings.company_short_name?.charAt(0) || 'I'}
                   </span>
                 </div>
               )}
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                {settings.company_short_name}
-              </span>
             </Link>
 
             {/* Desktop Navigation */}

@@ -41,23 +41,20 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link to="/" className="inline-flex items-center gap-2 mb-4">
-              {settings.logo ? (
+            <Link to="/" className="inline-block mb-4">
+              {(settings.logo_dark || settings.logo) ? (
                 <img
-                  src={getImageUrl(settings.logo)}
+                  src={getImageUrl(settings.logo_dark || settings.logo)}
                   alt={settings.company_name}
-                  className="w-10 h-10 rounded-xl object-contain"
+                  className="h-16 w-auto object-contain"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                  <span className="text-white font-bold text-3xl">
                     {settings.company_short_name?.charAt(0) || 'I'}
                   </span>
                 </div>
               )}
-              <span className="text-xl font-bold text-white">
-                {settings.company_name}
-              </span>
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm">
               {settings.tagline}

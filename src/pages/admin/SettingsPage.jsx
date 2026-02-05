@@ -23,10 +23,11 @@ import {
 } from 'lucide-react'
 
 export default function SettingsPage() {
-  const { settings, loading, updateSettings, removeLogo, removeFavicon, getImageUrl } = useCompanySettings()
+  const { settings, loading, updateSettings, removeLogo, removeDarkLogo, removeFavicon, getImageUrl } = useCompanySettings()
 
   const [formData, setFormData] = useState({})
   const [logoFile, setLogoFile] = useState(null)
+  const [logoDarkFile, setLogoDarkFile] = useState(null)
   const [faviconFile, setFaviconFile] = useState(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
@@ -49,7 +50,7 @@ export default function SettingsPage() {
     setError(null)
     setSuccess(false)
 
-    const result = await updateSettings(formData, logoFile, faviconFile)
+    const result = await updateSettings(formData, logoFile, faviconFile, logoDarkFile)
 
     setSaving(false)
 
@@ -59,6 +60,7 @@ export default function SettingsPage() {
     }
 
     setLogoFile(null)
+    setLogoDarkFile(null)
     setFaviconFile(null)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 3000)
@@ -72,6 +74,11 @@ export default function SettingsPage() {
   const handleRemoveFavicon = async () => {
     await removeFavicon()
     setFormData(prev => ({ ...prev, favicon: null }))
+  }
+
+  const handleRemoveDarkLogo = async () => {
+    await removeDarkLogo()
+    setFormData(prev => ({ ...prev, logo_dark: null }))
   }
 
   const tabs = [
@@ -233,7 +240,7 @@ export default function SettingsPage() {
                   Branding
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div>
                     <ImageUpload
                       label="Company Logo"
@@ -242,6 +249,17 @@ export default function SettingsPage() {
                       onRemove={formData.logo && !logoFile ? handleRemoveLogo : () => setLogoFile(null)}
                       aspectRatio={1}
                       helperText="Recommended: 200x200px, PNG with transparent background"
+                    />
+                  </div>
+
+                  <div>
+                    <ImageUpload
+                      label="Logo (Dark Background)"
+                      value={logoDarkFile || (formData.logo_dark ? getImageUrl(formData.logo_dark) : null)}
+                      onChange={setLogoDarkFile}
+                      onRemove={formData.logo_dark && !logoDarkFile ? handleRemoveDarkLogo : () => setLogoDarkFile(null)}
+                      aspectRatio={1}
+                      helperText="Used in footer. Should be visible on dark backgrounds."
                     />
                   </div>
 

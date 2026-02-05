@@ -93,24 +93,6 @@ export default function Hero() {
               Get Free Quote
             </Link>
           </motion.div>
-
-          {/* Trust Indicators */}
-          <motion.div
-            variants={heroTextVariants}
-            className="mt-12 pt-12 border-t border-gray-200"
-          >
-            <p className="text-sm text-gray-500 mb-4">Trusted by brands worldwide</p>
-            <div className="flex items-center justify-center gap-8 opacity-50">
-              {['Brand 1', 'Brand 2', 'Brand 3', 'Brand 4'].map((brand, index) => (
-                <div
-                  key={index}
-                  className="text-lg font-bold text-gray-400"
-                >
-                  {brand}
-                </div>
-              ))}
-            </div>
-          </motion.div>
         </motion.div>
       </div>
     </section>

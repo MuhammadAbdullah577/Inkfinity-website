@@ -144,6 +144,69 @@ export function useProducts(categoryId = null) {
     return products.find(p => p.id === id)
   }, [products])
 
+  const fetchTrendingProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          category:categories(id, name, slug)
+        `)
+        .eq('is_trending', true)
+        .order('trending_order', { ascending: true })
+
+      if (error) throw error
+      return { data: data || [], error: null }
+    } catch (err) {
+      console.error('Error fetching trending products:', err)
+      return { data: [], error: err }
+    }
+  }
+
+  const updateTrendingStatus = async (productId, isTrending, trendingOrder = 0) => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .update({ is_trending: isTrending, trending_order: trendingOrder })
+        .eq('id', productId)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, ...data } : p))
+      return { data, error: null }
+    } catch (err) {
+      console.error('Error updating trending status:', err)
+      return { data: null, error: err }
+    }
+  }
+
+  const bulkUpdateTrending = async (trendingProducts) => {
+    try {
+      // First, clear all trending flags
+      await supabase
+        .from('products')
+        .update({ is_trending: false, trending_order: 0 })
+        .eq('is_trending', true)
+
+      // Then set the new trending products with their order
+      for (let i = 0; i < trendingProducts.length; i++) {
+        await supabase
+          .from('products')
+          .update({ is_trending: true, trending_order: i })
+          .eq('id', trendingProducts[i].id)
+      }
+
+      // Refresh products
+      await fetchProducts()
+      return { error: null }
+    } catch (err) {
+      console.error('Error bulk updating trending:', err)
+      return { error: err }
+    }
+  }
+
   return {
     products,
     loading,
@@ -153,6 +216,9 @@ export function useProducts(categoryId = null) {
     updateProduct,
     deleteProduct,
     getProductById,
+    fetchTrendingProducts,
+    updateTrendingStatus,
+    bulkUpdateTrending,
     getImageUrl,
   }
 }

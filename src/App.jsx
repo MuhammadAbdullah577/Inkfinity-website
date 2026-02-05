@@ -17,6 +17,7 @@ import LoginPage from './pages/admin/LoginPage'
 import DashboardPage from './pages/admin/DashboardPage'
 import CategoriesManagePage from './pages/admin/CategoriesManagePage'
 import ProductsManagePage from './pages/admin/ProductsManagePage'
+import TrendingProductsPage from './pages/admin/TrendingProductsPage'
 import BlogManagePage from './pages/admin/BlogManagePage'
 import InquiriesPage from './pages/admin/InquiriesPage'
 import SettingsPage from './pages/admin/SettingsPage'
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/admin" element={<DashboardPage />} />
           <Route path="/admin/categories" element={<CategoriesManagePage />} />
           <Route path="/admin/products" element={<ProductsManagePage />} />
+          <Route path="/admin/trending" element={<TrendingProductsPage />} />
           <Route path="/admin/blog" element={<BlogManagePage />} />
           <Route path="/admin/inquiries" element={<InquiriesPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
