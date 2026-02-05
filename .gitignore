@@ -1,3 +1,6 @@
+# nul prevention
+nul
+
 # Logs
 logs
 *.log
