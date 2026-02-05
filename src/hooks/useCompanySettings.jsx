@@ -100,6 +100,45 @@ function useCompanySettingsInternal() {
     fetchSettings()
   }, [fetchSettings])
 
+  // Dynamically update favicon in browser tab with rounded corners
+  useEffect(() => {
+    if (settings.favicon) {
+      const faviconUrl = getImageUrl(settings.favicon)
+
+      // Load image and apply rounded corners via canvas
+      const img = new Image()
+      img.crossOrigin = 'anonymous' // Required for canvas with external images
+      img.onload = () => {
+        const size = 32 // Standard favicon size
+        const radius = 8 // Medium rounded corners
+
+        const canvas = document.createElement('canvas')
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')
+
+        // Draw rounded rectangle clipping path
+        ctx.beginPath()
+        ctx.roundRect(0, 0, size, size, radius)
+        ctx.clip()
+
+        // Draw the image
+        ctx.drawImage(img, 0, 0, size, size)
+
+        // Convert to data URL and set as favicon
+        const dataUrl = canvas.toDataURL('image/png')
+        let link = document.querySelector("link[rel~='icon']")
+        if (!link) {
+          link = document.createElement('link')
+          link.rel = 'icon'
+          document.head.appendChild(link)
+        }
+        link.href = dataUrl
+      }
+      img.src = faviconUrl
+    }
+  }, [settings.favicon])
+
   const updateSettings = async (newSettings, logoFile = null, faviconFile = null, logoDarkFile = null) => {
     try {
       let updateData = { ...newSettings }
