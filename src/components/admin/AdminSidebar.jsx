@@ -7,6 +7,7 @@ import {
   Package,
   FileText,
   MessageSquare,
+  Settings,
   Menu,
   X,
   ChevronLeft
@@ -18,6 +19,7 @@ const navItems = [
   { name: 'Products', path: '/admin/products', icon: Package },
   { name: 'Blog Posts', path: '/admin/blog', icon: FileText },
   { name: 'Inquiries', path: '/admin/inquiries', icon: MessageSquare },
+  { name: 'Settings', path: '/admin/settings', icon: Settings },
 ]
 
 export default function AdminSidebar() {

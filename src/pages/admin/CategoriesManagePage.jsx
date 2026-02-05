@@ -18,6 +18,7 @@ export default function CategoriesManagePage() {
   const [formData, setFormData] = useState({ name: '', slug: '', description: '' })
   const [imageFile, setImageFile] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
   const columns = [
     {
@@ -71,6 +72,7 @@ export default function CategoriesManagePage() {
     setSelectedCategory(null)
     setFormData({ name: '', slug: '', description: '' })
     setImageFile(null)
+    setError(null)
     setModalOpen(true)
   }
 
@@ -82,6 +84,7 @@ export default function CategoriesManagePage() {
       description: category.description || '',
     })
     setImageFile(null)
+    setError(null)
     setModalOpen(true)
   }
 
@@ -93,17 +96,25 @@ export default function CategoriesManagePage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
+    setError(null)
 
     // Auto-generate slug if empty
     const slug = formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-')
 
+    let result
     if (selectedCategory) {
-      await updateCategory(selectedCategory.id, { ...formData, slug }, imageFile)
+      result = await updateCategory(selectedCategory.id, { ...formData, slug }, imageFile)
     } else {
-      await createCategory({ ...formData, slug }, imageFile)
+      result = await createCategory({ ...formData, slug }, imageFile)
     }
 
     setSaving(false)
+
+    if (result?.error) {
+      setError(result.error.message || 'An error occurred while saving')
+      return
+    }
+
     setModalOpen(false)
   }
 
@@ -159,6 +170,12 @@ export default function CategoriesManagePage() {
           title={selectedCategory ? 'Edit Category' : 'Add Category'}
         >
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
             <Input
               label="Category Name"
               value={formData.name}
@@ -187,6 +204,8 @@ export default function CategoriesManagePage() {
               value={imageFile || (selectedCategory?.image ? getImageUrl(selectedCategory.image) : null)}
               onChange={setImageFile}
               onRemove={() => setImageFile(null)}
+              crop
+              aspectRatio={1}
             />
 
             <ModalFooter>

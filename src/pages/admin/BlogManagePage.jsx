@@ -25,6 +25,7 @@ export default function BlogManagePage() {
   })
   const [coverImage, setCoverImage] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
   const columns = [
     {
@@ -102,6 +103,7 @@ export default function BlogManagePage() {
       published: false,
     })
     setCoverImage(null)
+    setError(null)
     setModalOpen(true)
   }
 
@@ -116,6 +118,7 @@ export default function BlogManagePage() {
       published: post.published || false,
     })
     setCoverImage(null)
+    setError(null)
     setModalOpen(true)
   }
 
@@ -131,16 +134,24 @@ export default function BlogManagePage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
+    setError(null)
 
     const slug = formData.slug || formData.title.toLowerCase().replace(/\s+/g, '-')
 
+    let result
     if (selectedPost) {
-      await updatePost(selectedPost.id, { ...formData, slug }, coverImage)
+      result = await updatePost(selectedPost.id, { ...formData, slug }, coverImage)
     } else {
-      await createPost({ ...formData, slug }, coverImage)
+      result = await createPost({ ...formData, slug }, coverImage)
     }
 
     setSaving(false)
+
+    if (result?.error) {
+      setError(result.error.message || 'An error occurred while saving')
+      return
+    }
+
     setModalOpen(false)
   }
 
@@ -208,6 +219,12 @@ export default function BlogManagePage() {
           size="lg"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
             <Input
               label="Title"
               value={formData.title}
@@ -245,6 +262,8 @@ export default function BlogManagePage() {
               value={coverImage || (selectedPost?.cover_image ? getImageUrl(selectedPost.cover_image) : null)}
               onChange={setCoverImage}
               onRemove={() => setCoverImage(null)}
+              crop
+              aspectRatio={16/9}
             />
 
             <div className="flex items-center gap-6">

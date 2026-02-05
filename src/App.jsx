@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { CompanySettingsProvider } from './hooks/useCompanySettings'
 
 // Public Pages
 import HomePage from './pages/public/HomePage'
@@ -18,12 +19,14 @@ import CategoriesManagePage from './pages/admin/CategoriesManagePage'
 import ProductsManagePage from './pages/admin/ProductsManagePage'
 import BlogManagePage from './pages/admin/BlogManagePage'
 import InquiriesPage from './pages/admin/InquiriesPage'
+import SettingsPage from './pages/admin/SettingsPage'
 
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
+      <CompanySettingsProvider>
+        <Router>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
@@ -42,8 +45,10 @@ export default function App() {
           <Route path="/admin/products" element={<ProductsManagePage />} />
           <Route path="/admin/blog" element={<BlogManagePage />} />
           <Route path="/admin/inquiries" element={<InquiriesPage />} />
-        </Routes>
-      </Router>
+          <Route path="/admin/settings" element={<SettingsPage />} />
+          </Routes>
+        </Router>
+      </CompanySettingsProvider>
     </AuthProvider>
   )
 }

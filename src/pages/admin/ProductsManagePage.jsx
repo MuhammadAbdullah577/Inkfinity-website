@@ -22,6 +22,7 @@ export default function ProductsManagePage() {
   const [existingImages, setExistingImages] = useState([])
   const [imagesToRemove, setImagesToRemove] = useState([])
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
   const categoryOptions = categories.map(c => ({ value: c.id, label: c.name }))
 
@@ -79,6 +80,7 @@ export default function ProductsManagePage() {
     setImageFiles([])
     setExistingImages([])
     setImagesToRemove([])
+    setError(null)
     setModalOpen(true)
   }
 
@@ -92,6 +94,7 @@ export default function ProductsManagePage() {
     setImageFiles([])
     setExistingImages(product.images || [])
     setImagesToRemove([])
+    setError(null)
     setModalOpen(true)
   }
 
@@ -108,14 +111,22 @@ export default function ProductsManagePage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
+    setError(null)
 
+    let result
     if (selectedProduct) {
-      await updateProduct(selectedProduct.id, formData, imageFiles, imagesToRemove)
+      result = await updateProduct(selectedProduct.id, formData, imageFiles, imagesToRemove)
     } else {
-      await createProduct(formData, imageFiles)
+      result = await createProduct(formData, imageFiles)
     }
 
     setSaving(false)
+
+    if (result?.error) {
+      setError(result.error.message || 'An error occurred while saving')
+      return
+    }
+
     setModalOpen(false)
   }
 
@@ -172,6 +183,12 @@ export default function ProductsManagePage() {
           size="lg"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
             <Input
               label="Product Name"
               value={formData.name}
@@ -229,6 +246,8 @@ export default function ProductsManagePage() {
               onChange={(files) => setImageFiles(Array.isArray(files) ? files : [files])}
               onRemove={(index) => setImageFiles(prev => prev.filter((_, i) => i !== index))}
               multiple
+              crop
+              aspectRatio={1}
             />
 
             <ModalFooter>

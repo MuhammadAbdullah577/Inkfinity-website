@@ -80,17 +80,44 @@ CREATE POLICY "Public can create inquiries" ON contact_inquiries
   FOR INSERT WITH CHECK (true);
 
 -- Policies for authenticated users (admin)
+-- NOTE: Using auth.uid() IS NOT NULL instead of auth.role() = 'authenticated'
+-- because auth.role() doesn't work correctly with Supabase Auth
 CREATE POLICY "Authenticated users can manage categories" ON categories
-  FOR ALL USING (auth.role() = 'authenticated');
+  FOR ALL USING (auth.uid() IS NOT NULL);
 
 CREATE POLICY "Authenticated users can manage products" ON products
-  FOR ALL USING (auth.role() = 'authenticated');
+  FOR ALL USING (auth.uid() IS NOT NULL);
 
 CREATE POLICY "Authenticated users can manage blog posts" ON blog_posts
-  FOR ALL USING (auth.role() = 'authenticated');
+  FOR ALL USING (auth.uid() IS NOT NULL);
 
 CREATE POLICY "Authenticated users can manage inquiries" ON contact_inquiries
-  FOR ALL USING (auth.role() = 'authenticated');
+  FOR ALL USING (auth.uid() IS NOT NULL);
+
+-- ============================================================
+-- RLS FIX: Run this SQL in Supabase Dashboard > SQL Editor
+-- if you already have the tables created with old policies:
+-- ============================================================
+/*
+-- Drop existing policies
+DROP POLICY IF EXISTS "Authenticated users can manage categories" ON categories;
+DROP POLICY IF EXISTS "Authenticated users can manage products" ON products;
+DROP POLICY IF EXISTS "Authenticated users can manage blog posts" ON blog_posts;
+DROP POLICY IF EXISTS "Authenticated users can manage inquiries" ON contact_inquiries;
+
+-- Recreate with correct auth check
+CREATE POLICY "Authenticated users can manage categories" ON categories
+  FOR ALL USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Authenticated users can manage products" ON products
+  FOR ALL USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Authenticated users can manage blog posts" ON blog_posts
+  FOR ALL USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Authenticated users can manage inquiries" ON contact_inquiries
+  FOR ALL USING (auth.uid() IS NOT NULL);
+*/
 
 -- Create storage bucket for product images
 -- Note: Run this in the Supabase Dashboard > Storage > Create new bucket

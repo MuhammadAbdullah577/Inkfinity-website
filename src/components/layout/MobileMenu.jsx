@@ -2,9 +2,11 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { X } from 'lucide-react'
 import { mobileMenuVariants, backdropVariants } from '../../animations/variants'
+import { useCompanySettings } from '../../hooks/useCompanySettings'
 
 export default function MobileMenu({ isOpen, onClose, links }) {
   const location = useLocation()
+  const { settings, getImageUrl } = useCompanySettings()
 
   return (
     <AnimatePresence>
@@ -31,10 +33,20 @@ export default function MobileMenu({ isOpen, onClose, links }) {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                  <span className="text-white font-bold">I</span>
-                </div>
-                <span className="font-bold text-gray-900">Inkfinity</span>
+                {settings.logo ? (
+                  <img
+                    src={getImageUrl(settings.logo)}
+                    alt={settings.company_name}
+                    className="w-8 h-8 rounded-lg object-contain"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                    <span className="text-white font-bold">
+                      {settings.company_short_name?.charAt(0) || 'I'}
+                    </span>
+                  </div>
+                )}
+                <span className="font-bold text-gray-900">{settings.company_short_name}</span>
               </div>
               <button
                 onClick={onClose}

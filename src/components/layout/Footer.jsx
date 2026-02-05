@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter } from 'lucide-react'
+import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react'
+import { useCompanySettings } from '../../hooks/useCompanySettings'
 
 const footerLinks = {
   products: [
@@ -21,14 +22,18 @@ const footerLinks = {
   ],
 }
 
-const socialLinks = [
-  { icon: Facebook, href: '#', label: 'Facebook' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
-]
-
 export default function Footer() {
+  const { settings, getImageUrl } = useCompanySettings()
+
+  // Build social links dynamically based on settings
+  const socialLinks = [
+    settings.facebook_url && { icon: Facebook, href: settings.facebook_url, label: 'Facebook' },
+    settings.instagram_url && { icon: Instagram, href: settings.instagram_url, label: 'Instagram' },
+    settings.linkedin_url && { icon: Linkedin, href: settings.linkedin_url, label: 'LinkedIn' },
+    settings.twitter_url && { icon: Twitter, href: settings.twitter_url, label: 'Twitter' },
+    settings.youtube_url && { icon: Youtube, href: settings.youtube_url, label: 'YouTube' },
+  ].filter(Boolean)
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Main Footer */}
@@ -37,35 +42,51 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link to="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">I</span>
-              </div>
+              {settings.logo ? (
+                <img
+                  src={getImageUrl(settings.logo)}
+                  alt={settings.company_name}
+                  className="w-10 h-10 rounded-xl object-contain"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">
+                    {settings.company_short_name?.charAt(0) || 'I'}
+                  </span>
+                </div>
+              )}
               <span className="text-xl font-bold text-white">
-                Inkfinity Creation
+                {settings.company_name}
               </span>
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm">
-              Premium custom clothing manufacturer offering high-quality products with no minimum order quantity. From concept to creation, we bring your vision to life.
+              {settings.tagline}
             </p>
 
             {/* Contact Info */}
             <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-blue-400 shrink-0" />
-                <span>Sialkot, Punjab, Pakistan</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-blue-400 shrink-0" />
-                <a href="mailto:info@inkfinitycreation.com" className="hover:text-white transition-colors">
-                  info@inkfinitycreation.com
-                </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-blue-400 shrink-0" />
-                <a href="tel:+923001234567" className="hover:text-white transition-colors">
-                  +92 300 1234567
-                </a>
-              </div>
+              {settings.address && (
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-5 h-5 text-blue-400 shrink-0" />
+                  <span>{settings.address}</span>
+                </div>
+              )}
+              {settings.email && (
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-blue-400 shrink-0" />
+                  <a href={`mailto:${settings.email}`} className="hover:text-white transition-colors">
+                    {settings.email}
+                  </a>
+                </div>
+              )}
+              {settings.phone && (
+                <div className="flex items-center gap-3">
+                  <Phone className="w-5 h-5 text-blue-400 shrink-0" />
+                  <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="hover:text-white transition-colors">
+                    {settings.phone}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
 
@@ -127,22 +148,26 @@ export default function Footer() {
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-400">
-              {new Date().getFullYear()} Inkfinity Creation. All rights reserved.
+              {new Date().getFullYear()} {settings.company_name}. All rights reserved.
             </p>
 
             {/* Social Links */}
-            <div className="flex items-center gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="flex items-center gap-4">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    <social.icon className="w-5 h-5" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

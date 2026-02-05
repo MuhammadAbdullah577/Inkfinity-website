@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, Crop } from 'lucide-react'
+import ImageCropper from './ImageCropper'
 
 export default function ImageUpload({
   value,
@@ -11,9 +12,15 @@ export default function ImageUpload({
   maxSize = 5 * 1024 * 1024, // 5MB
   className = '',
   label = 'Upload Image',
+  crop = false,
+  aspectRatio = 1,
 }) {
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState(null)
+  const [cropperOpen, setCropperOpen] = useState(false)
+  const [imageToCrop, setImageToCrop] = useState(null)
+  const [pendingFiles, setPendingFiles] = useState([])
+  const [currentCropIndex, setCurrentCropIndex] = useState(0)
   const inputRef = useRef(null)
 
   const handleDragOver = (e) => {
@@ -48,11 +55,64 @@ export default function ImageUpload({
       }
     }
 
-    if (multiple) {
-      onChange(fileArray)
+    if (crop) {
+      // Open cropper for the first file
+      if (multiple) {
+        setPendingFiles(fileArray)
+        setCurrentCropIndex(0)
+        openCropper(fileArray[0])
+      } else {
+        openCropper(fileArray[0])
+      }
     } else {
-      onChange(fileArray[0])
+      // No cropping, pass files directly
+      if (multiple) {
+        onChange(fileArray)
+      } else {
+        onChange(fileArray[0])
+      }
     }
+  }
+
+  const openCropper = (file) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      setImageToCrop(reader.result)
+      setCropperOpen(true)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleCropComplete = (croppedFile) => {
+    setCropperOpen(false)
+    setImageToCrop(null)
+
+    if (multiple) {
+      // Check if there are more files to crop
+      const nextIndex = currentCropIndex + 1
+      if (nextIndex < pendingFiles.length) {
+        // Store the cropped file and move to next
+        const newCroppedFiles = [...(Array.isArray(value) ? value : []), croppedFile]
+        onChange(newCroppedFiles)
+        setCurrentCropIndex(nextIndex)
+        openCropper(pendingFiles[nextIndex])
+      } else {
+        // Last file, finalize
+        const newCroppedFiles = [...(Array.isArray(value) ? value : []), croppedFile]
+        onChange(newCroppedFiles)
+        setPendingFiles([])
+        setCurrentCropIndex(0)
+      }
+    } else {
+      onChange(croppedFile)
+    }
+  }
+
+  const handleCropCancel = () => {
+    setCropperOpen(false)
+    setImageToCrop(null)
+    setPendingFiles([])
+    setCurrentCropIndex(0)
   }
 
   const handleDrop = (e) => {
@@ -65,6 +125,8 @@ export default function ImageUpload({
     if (e.target.files) {
       handleFiles(e.target.files)
     }
+    // Reset input value so the same file can be selected again
+    e.target.value = ''
   }
 
   const images = multiple
@@ -76,6 +138,12 @@ export default function ImageUpload({
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label}
+          {crop && (
+            <span className="ml-2 inline-flex items-center text-xs text-gray-500">
+              <Crop className="w-3 h-3 mr-1" />
+              Crop enabled
+            </span>
+          )}
         </label>
       )}
 
@@ -142,6 +210,7 @@ export default function ImageUpload({
                 <ImagePreview
                   key={index}
                   image={image}
+                  aspectRatio={aspectRatio}
                   onRemove={() => {
                     if (multiple) {
                       onRemove?.(index)
@@ -155,23 +224,39 @@ export default function ImageUpload({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Image Cropper Modal */}
+      <ImageCropper
+        isOpen={cropperOpen}
+        image={imageToCrop}
+        aspect={aspectRatio}
+        onCropComplete={handleCropComplete}
+        onCancel={handleCropCancel}
+      />
     </div>
   )
 }
 
-function ImagePreview({ image, onRemove }) {
+function ImagePreview({ image, aspectRatio, onRemove }) {
   const [loaded, setLoaded] = useState(false)
 
   const src = image instanceof File
     ? URL.createObjectURL(image)
     : image
 
+  // Determine aspect ratio class
+  const aspectClass = aspectRatio === 16/9
+    ? 'aspect-video'
+    : aspectRatio === 1
+      ? 'aspect-square'
+      : 'aspect-video'
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="relative group rounded-lg overflow-hidden bg-gray-100 aspect-video"
+      className={`relative group rounded-lg overflow-hidden bg-gray-100 ${aspectClass}`}
     >
       {!loaded && (
         <div className="absolute inset-0 flex items-center justify-center">

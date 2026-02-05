@@ -5,11 +5,13 @@ import Input, { Textarea, Select } from '../../components/common/Input'
 import Button from '../../components/common/Button'
 import { useInquiries } from '../../hooks/useInquiries'
 import { useCategories } from '../../hooks/useCategories'
+import { useCompanySettings } from '../../hooks/useCompanySettings'
 import { Mail, Phone, MapPin, Clock, CheckCircle } from 'lucide-react'
 
 export default function ContactPage() {
   const { createInquiry } = useInquiries()
   const { categories } = useCategories()
+  const { settings } = useCompanySettings()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -126,55 +128,61 @@ export default function ContactPage() {
               </div>
 
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg shrink-0">
-                    <MapPin className="w-5 h-5 text-blue-600" />
+                {settings.address && (
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-blue-50 rounded-lg shrink-0">
+                      <MapPin className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Address</h3>
+                      <p className="text-gray-600 whitespace-pre-line">
+                        {settings.address}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Address</h3>
-                    <p className="text-gray-600">
-                      Sialkot, Punjab<br />
-                      Pakistan
-                    </p>
-                  </div>
-                </div>
+                )}
 
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg shrink-0">
-                    <Mail className="w-5 h-5 text-blue-600" />
+                {settings.email && (
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-blue-50 rounded-lg shrink-0">
+                      <Mail className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Email</h3>
+                      <a href={`mailto:${settings.email}`} className="text-gray-600 hover:text-blue-600">
+                        {settings.email}
+                      </a>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Email</h3>
-                    <a href="mailto:info@inkfinitycreation.com" className="text-gray-600 hover:text-blue-600">
-                      info@inkfinitycreation.com
-                    </a>
-                  </div>
-                </div>
+                )}
 
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg shrink-0">
-                    <Phone className="w-5 h-5 text-blue-600" />
+                {settings.phone && (
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-blue-50 rounded-lg shrink-0">
+                      <Phone className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Phone</h3>
+                      <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="text-gray-600 hover:text-blue-600">
+                        {settings.phone}
+                      </a>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Phone</h3>
-                    <a href="tel:+923001234567" className="text-gray-600 hover:text-blue-600">
-                      +92 300 1234567
-                    </a>
-                  </div>
-                </div>
+                )}
 
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg shrink-0">
-                    <Clock className="w-5 h-5 text-blue-600" />
+                {settings.business_hours && (
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-blue-50 rounded-lg shrink-0">
+                      <Clock className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Business Hours</h3>
+                      <p className="text-gray-600 whitespace-pre-line">
+                        {settings.business_hours}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Business Hours</h3>
-                    <p className="text-gray-600">
-                      Monday - Saturday<br />
-                      9:00 AM - 6:00 PM (PKT)
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
             </motion.div>
 
