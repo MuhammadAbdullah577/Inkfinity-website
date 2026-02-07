@@ -2,13 +2,24 @@ import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import Layout from '../../components/layout/Layout'
 import { useCategories } from '../../hooks/useCategories'
+import { usePagination } from '../../hooks/usePagination'
 import { CardSkeleton } from '../../components/common/Loader'
+import { Pagination } from '../../components/admin/DataTable'
 import { staggerContainer, fadeInUp } from '../../animations/variants'
 import { getImageUrl } from '../../lib/supabase'
 import { ArrowRight } from 'lucide-react'
 
 export default function CategoriesPage() {
   const { categories, loading } = useCategories()
+
+  const {
+    currentPage,
+    totalPages,
+    totalItems,
+    paginatedData: paginatedCategories,
+    goToPage,
+    itemsPerPage,
+  } = usePagination(categories, 12)
 
   return (
     <Layout>
@@ -43,16 +54,30 @@ export default function CategoriesPage() {
               ))}
             </div>
           ) : (
-            <motion.div
-              variants={staggerContainer}
-              initial="initial"
-              animate="animate"
-              className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {categories.map((category) => (
-                <CategoryCard key={category.id} category={category} />
-              ))}
-            </motion.div>
+            <>
+              <motion.div
+                variants={staggerContainer}
+                initial="initial"
+                animate="animate"
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {paginatedCategories.map((category) => (
+                  <CategoryCard key={category.id} category={category} />
+                ))}
+              </motion.div>
+
+              {totalPages > 1 && (
+                <div className="mt-12">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={goToPage}
+                  />
+                </div>
+              )}
+            </>
           )}
 
           {!loading && categories.length === 0 && (

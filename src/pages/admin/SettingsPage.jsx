@@ -19,11 +19,14 @@ import {
   Youtube,
   Clock,
   Search,
-  MessageCircle
+  MessageCircle,
+  LayoutGrid
 } from 'lucide-react'
+import { useCategories } from '../../hooks/useCategories'
 
 export default function SettingsPage() {
   const { settings, loading, updateSettings, removeLogo, removeDarkLogo, removeFavicon, getImageUrl } = useCompanySettings()
+  const { categories } = useCategories()
 
   const [formData, setFormData] = useState({})
   const [logoFile, setLogoFile] = useState(null)
@@ -87,7 +90,24 @@ export default function SettingsPage() {
     { id: 'branding', label: 'Branding', icon: ImageIcon },
     { id: 'social', label: 'Social Media', icon: Globe },
     { id: 'seo', label: 'SEO', icon: Search },
+    { id: 'footer', label: 'Footer', icon: LayoutGrid },
   ]
+
+  const handleFooterCategoryToggle = (categoryId) => {
+    const currentCategories = formData.footer_categories || []
+    let newCategories
+
+    if (currentCategories.includes(categoryId)) {
+      newCategories = currentCategories.filter(id => id !== categoryId)
+    } else {
+      if (currentCategories.length >= 5) {
+        return // Max 5 categories
+      }
+      newCategories = [...currentCategories, categoryId]
+    }
+
+    setFormData(prev => ({ ...prev, footer_categories: newCategories }))
+  }
 
   if (loading) {
     return (
@@ -376,6 +396,75 @@ export default function SettingsPage() {
                   rows={2}
                   helperText="Comma-separated keywords related to your business"
                 />
+              </div>
+            )}
+
+            {/* Footer Tab */}
+            {activeTab === 'footer' && (
+              <div className="space-y-6">
+                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <LayoutGrid className="w-5 h-5" />
+                  Footer Settings
+                </h2>
+
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Footer Product Categories
+                    </label>
+                    <span className="text-sm text-gray-500">
+                      {(formData.footer_categories || []).length} / 5 selected
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Select up to 5 categories to display in the footer's "Products" section.
+                  </p>
+
+                  {categories.length === 0 ? (
+                    <div className="text-center py-8 bg-gray-50 rounded-lg">
+                      <p className="text-gray-500">No categories found. Create categories first.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {categories.map((category) => {
+                        const isSelected = (formData.footer_categories || []).includes(category.id)
+                        const isDisabled = !isSelected && (formData.footer_categories || []).length >= 5
+
+                        return (
+                          <label
+                            key={category.id}
+                            className={`
+                              flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors
+                              ${isSelected
+                                ? 'bg-blue-50 border-blue-200'
+                                : isDisabled
+                                  ? 'bg-gray-50 border-gray-200 opacity-50 cursor-not-allowed'
+                                  : 'bg-white border-gray-200 hover:bg-gray-50'
+                              }
+                            `}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              disabled={isDisabled}
+                              onChange={() => handleFooterCategoryToggle(category.id)}
+                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className={`text-sm ${isSelected ? 'text-blue-700 font-medium' : 'text-gray-700'}`}>
+                              {category.name}
+                            </span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-600">
+                    Selected categories will appear in the footer under "Products". If none are selected, a "View All Categories" link will be shown instead.
+                  </p>
+                </div>
               </div>
             )}
 

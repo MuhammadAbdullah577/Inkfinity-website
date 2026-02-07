@@ -1,29 +1,25 @@
 import { Link } from 'react-router-dom'
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react'
 import { useCompanySettings } from '../../hooks/useCompanySettings'
+import { useCategories } from '../../hooks/useCategories'
 
 const footerLinks = {
-  products: [
-    { name: 'T-Shirts', path: '/categories/t-shirts' },
-    { name: 'Hoodies', path: '/categories/hoodies' },
-    { name: 'Jackets', path: '/categories/jackets' },
-    { name: 'Sportswear', path: '/categories/sportswear' },
-    { name: 'Polo Shirts', path: '/categories/polo-shirts' },
-  ],
   company: [
     { name: 'About Us', path: '/about' },
     { name: 'Blog', path: '/blog' },
     { name: 'Contact', path: '/contact' },
   ],
-  support: [
-    { name: 'FAQ', path: '/faq' },
-    { name: 'Shipping Info', path: '/shipping' },
-    { name: 'Size Guide', path: '/size-guide' },
-  ],
 }
 
 export default function Footer() {
-  const { settings, getImageUrl } = useCompanySettings()
+  const { settings, loading, getImageUrl } = useCompanySettings()
+  const { categories } = useCategories()
+
+  // Get footer categories from settings, limited to 5
+  const footerCategories = (settings.footer_categories || [])
+    .map(id => categories.find(c => c.id === id))
+    .filter(Boolean)
+    .slice(0, 5)
 
   // Build social links dynamically based on settings
   const socialLinks = [
@@ -38,11 +34,13 @@ export default function Footer() {
     <footer className="bg-gray-900 text-gray-300">
       {/* Main Footer */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link to="/" className="inline-block mb-4">
-              {(settings.logo_dark || settings.logo) ? (
+              {loading ? (
+                <div className="w-16 h-16 rounded-xl bg-gray-700 animate-pulse" />
+              ) : (settings.logo_dark || settings.logo) ? (
                 <img
                   src={getImageUrl(settings.logo_dark || settings.logo)}
                   alt={settings.company_name}
@@ -91,16 +89,27 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">Products</h3>
             <ul className="space-y-2">
-              {footerLinks.products.map((link) => (
-                <li key={link.path}>
+              {footerCategories.length > 0 ? (
+                footerCategories.map((category) => (
+                  <li key={category.id}>
+                    <Link
+                      to={`/categories/${category.slug}`}
+                      className="hover:text-white transition-colors"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li>
                   <Link
-                    to={link.path}
+                    to="/categories"
                     className="hover:text-white transition-colors"
                   >
-                    {link.name}
+                    View All Categories
                   </Link>
                 </li>
-              ))}
+              )}
             </ul>
           </div>
 
@@ -121,22 +130,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Support Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Support</h3>
-            <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
-                <li key={link.path}>
-                  <Link
-                    to={link.path}
-                    className="hover:text-white transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
 

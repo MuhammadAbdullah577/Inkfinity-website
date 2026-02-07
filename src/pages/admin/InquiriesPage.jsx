@@ -1,25 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AdminLayout from '../../components/admin/AdminLayout'
-import DataTable from '../../components/admin/DataTable'
+import DataTable, { Pagination } from '../../components/admin/DataTable'
 import Modal, { ModalFooter } from '../../components/common/Modal'
 import Button from '../../components/common/Button'
 import { useInquiries } from '../../hooks/useInquiries'
 import { Eye, Trash2, Mail, MailOpen, Clock } from 'lucide-react'
 
 export default function InquiriesPage() {
-  const { inquiries, loading, markAsRead, markAsUnread, deleteInquiry } = useInquiries()
+  const { inquiries, loading, pagination, fetchInquiries, markAsRead, markAsUnread, deleteInquiry } = useInquiries()
 
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedInquiry, setSelectedInquiry] = useState(null)
   const [saving, setSaving] = useState(false)
   const [filter, setFilter] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const filteredInquiries = inquiries.filter(inquiry => {
-    if (filter === 'unread') return !inquiry.read
-    if (filter === 'read') return inquiry.read
-    return true
-  })
+  // Fetch with pagination and filter
+  useEffect(() => {
+    fetchInquiries({
+      page: currentPage,
+      pageSize: 20,
+      status: filter === 'all' ? undefined : filter,
+    })
+  }, [currentPage, filter, fetchInquiries])
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filter])
 
   const columns = [
     {
@@ -142,7 +151,7 @@ export default function InquiriesPage() {
         {/* Table */}
         <DataTable
           columns={columns}
-          data={filteredInquiries}
+          data={inquiries}
           loading={loading}
           emptyMessage="No inquiries found"
           actions={(row) => (
@@ -175,6 +184,16 @@ export default function InquiriesPage() {
             </>
           )}
         />
+
+        {pagination.totalPages > 1 && (
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.total}
+            itemsPerPage={pagination.pageSize}
+            onPageChange={setCurrentPage}
+          />
+        )}
 
         {/* View Modal */}
         <Modal

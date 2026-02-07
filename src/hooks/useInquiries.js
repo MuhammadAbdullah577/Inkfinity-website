@@ -6,14 +6,40 @@ export function useInquiries() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 20,
+    total: 0,
+    totalPages: 0,
+  })
 
   const fetchInquiries = useCallback(async (filters = {}) => {
     try {
       setLoading(true)
+      const page = filters.page || 1
+      const pageSize = filters.pageSize || 20
+      const from = (page - 1) * pageSize
+      const to = from + pageSize - 1
+
+      // First, get total count
+      let countQuery = supabase
+        .from('contact_inquiries')
+        .select('*', { count: 'exact', head: true })
+
+      if (filters.status === 'unread') {
+        countQuery = countQuery.eq('read', false)
+      } else if (filters.status === 'read') {
+        countQuery = countQuery.eq('read', true)
+      }
+
+      const { count } = await countQuery
+
+      // Then get paginated data
       let query = supabase
         .from('contact_inquiries')
         .select('*')
         .order('created_at', { ascending: false })
+        .range(from, to)
 
       if (filters.status === 'unread') {
         query = query.eq('read', false)
@@ -25,7 +51,20 @@ export function useInquiries() {
 
       if (error) throw error
       setInquiries(data || [])
-      setUnreadCount(data?.filter(i => !i.read).length || 0)
+      setPagination({
+        page,
+        pageSize,
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / pageSize),
+      })
+
+      // Get unread count separately (global, not paginated)
+      const { count: unread } = await supabase
+        .from('contact_inquiries')
+        .select('*', { count: 'exact', head: true })
+        .eq('read', false)
+
+      setUnreadCount(unread || 0)
     } catch (err) {
       setError(err.message)
       console.error('Error fetching inquiries:', err)
@@ -122,6 +161,7 @@ export function useInquiries() {
     loading,
     error,
     unreadCount,
+    pagination,
     fetchInquiries,
     createInquiry,
     markAsRead,

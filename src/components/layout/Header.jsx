@@ -17,7 +17,7 @@ const navLinks = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
-  const { settings, getImageUrl } = useCompanySettings()
+  const { settings, loading, getImageUrl } = useCompanySettings()
 
   return (
     <>
@@ -26,7 +26,9 @@ export default function Header() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link to="/" className="shrink-0">
-              {settings.logo ? (
+              {loading ? (
+                <div className="w-16 h-16 rounded-xl bg-gray-200 animate-pulse" />
+              ) : settings.logo ? (
                 <img
                   src={getImageUrl(settings.logo)}
                   alt={settings.company_name}

@@ -5,6 +5,7 @@ import Layout from '../../components/layout/Layout'
 import ProductGrid from '../../components/products/ProductGrid'
 import ProductFilters from '../../components/products/ProductFilters'
 import Modal from '../../components/common/Modal'
+import { Pagination } from '../../components/admin/DataTable'
 import { useProducts } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { getImageUrl } from '../../lib/supabase'
@@ -15,10 +16,11 @@ export default function ProductGalleryPage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const { categories } = useCategories()
-  const { products, loading, fetchProducts } = useProducts()
+  const { products, loading, pagination, fetchProducts } = useProducts()
 
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [quickViewProduct, setQuickViewProduct] = useState(null)
 
@@ -32,13 +34,20 @@ export default function ProductGalleryPage() {
     }
   }, [slug, categories])
 
-  // Fetch products when filters change
+  // Fetch products when filters or page change
   useEffect(() => {
     fetchProducts({
       categoryId: selectedCategory,
       search: searchQuery,
+      page: currentPage,
+      pageSize: 12,
     })
-  }, [selectedCategory, searchQuery, fetchProducts])
+  }, [selectedCategory, searchQuery, currentPage, fetchProducts])
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory, searchQuery])
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId)
@@ -99,6 +108,18 @@ export default function ProductGalleryPage() {
                 loading={loading}
                 onQuickView={setQuickViewProduct}
               />
+
+              {pagination.totalPages > 1 && (
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.totalPages}
+                    totalItems={pagination.total}
+                    itemsPerPage={pagination.pageSize}
+                    onPageChange={setCurrentPage}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

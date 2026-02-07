@@ -1,16 +1,26 @@
 import { useState } from 'react'
 import AdminLayout from '../../components/admin/AdminLayout'
-import DataTable from '../../components/admin/DataTable'
+import DataTable, { Pagination } from '../../components/admin/DataTable'
 import Modal, { ModalFooter } from '../../components/common/Modal'
 import Input, { Textarea } from '../../components/common/Input'
 import Button from '../../components/common/Button'
 import ImageUpload from '../../components/common/ImageUpload'
 import { useBlogPosts } from '../../hooks/useBlogPosts'
+import { usePagination } from '../../hooks/usePagination'
 import { getImageUrl } from '../../lib/supabase'
 import { Plus, Pencil, Trash2, Image as ImageIcon, Eye, EyeOff } from 'lucide-react'
 
 export default function BlogManagePage() {
   const { posts, loading, createPost, updatePost, deletePost, togglePublished } = useBlogPosts()
+
+  const {
+    currentPage,
+    totalPages,
+    totalItems,
+    paginatedData: paginatedPosts,
+    goToPage,
+    itemsPerPage,
+  } = usePagination(posts, 15)
 
   const [modalOpen, setModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -179,7 +189,7 @@ export default function BlogManagePage() {
         {/* Table */}
         <DataTable
           columns={columns}
-          data={posts}
+          data={paginatedPosts}
           loading={loading}
           emptyMessage="No blog posts found"
           actions={(row) => (
@@ -210,6 +220,16 @@ export default function BlogManagePage() {
             </>
           )}
         />
+
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={goToPage}
+          />
+        )}
 
         {/* Add/Edit Modal */}
         <Modal

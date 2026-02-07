@@ -5,10 +5,37 @@ export function useProducts(categoryId = null) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 12,
+    total: 0,
+    totalPages: 0,
+  })
 
   const fetchProducts = useCallback(async (filters = {}) => {
     try {
       setLoading(true)
+      const page = filters.page || 1
+      const pageSize = filters.pageSize || 12
+      const from = (page - 1) * pageSize
+      const to = from + pageSize - 1
+
+      // First, get total count
+      let countQuery = supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+
+      if (filters.categoryId || categoryId) {
+        countQuery = countQuery.eq('category_id', filters.categoryId || categoryId)
+      }
+
+      if (filters.search) {
+        countQuery = countQuery.ilike('name', `%${filters.search}%`)
+      }
+
+      const { count } = await countQuery
+
+      // Then get paginated data
       let query = supabase
         .from('products')
         .select(`
@@ -16,6 +43,7 @@ export function useProducts(categoryId = null) {
           category:categories(id, name, slug)
         `)
         .order('created_at', { ascending: false })
+        .range(from, to)
 
       if (filters.categoryId || categoryId) {
         query = query.eq('category_id', filters.categoryId || categoryId)
@@ -29,6 +57,12 @@ export function useProducts(categoryId = null) {
 
       if (error) throw error
       setProducts(data || [])
+      setPagination({
+        page,
+        pageSize,
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / pageSize),
+      })
     } catch (err) {
       setError(err.message)
       console.error('Error fetching products:', err)
@@ -211,6 +245,7 @@ export function useProducts(categoryId = null) {
     products,
     loading,
     error,
+    pagination,
     fetchProducts,
     createProduct,
     updateProduct,

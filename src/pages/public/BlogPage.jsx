@@ -3,12 +3,23 @@ import Layout from '../../components/layout/Layout'
 import BlogCard from '../../components/blog/BlogCard'
 import BlogGrid from '../../components/blog/BlogGrid'
 import { useBlogPosts } from '../../hooks/useBlogPosts'
+import { usePagination } from '../../hooks/usePagination'
+import { Pagination } from '../../components/admin/DataTable'
 
 export default function BlogPage() {
   const { posts, loading, getFeaturedPost } = useBlogPosts(true)
 
   const featuredPost = getFeaturedPost()
   const regularPosts = posts.filter(p => p.id !== featuredPost?.id)
+
+  const {
+    currentPage,
+    totalPages,
+    totalItems,
+    paginatedData: paginatedPosts,
+    goToPage,
+    itemsPerPage,
+  } = usePagination(regularPosts, 9)
 
   return (
     <Layout>
@@ -45,7 +56,19 @@ export default function BlogPage() {
       {/* Blog Grid */}
       <section className="py-16 lg:py-24">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <BlogGrid posts={regularPosts} loading={loading} />
+          <BlogGrid posts={paginatedPosts} loading={loading} />
+
+          {totalPages > 1 && (
+            <div className="mt-12">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={goToPage}
+              />
+            </div>
+          )}
         </div>
       </section>
     </Layout>

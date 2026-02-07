@@ -32,6 +32,9 @@ const defaultSettings = {
   meta_title: 'Inkfinity Creation - Premium Custom Clothing Manufacturer',
   meta_description: 'Inkfinity Creation - Premium custom clothing manufacturer. No minimum order quantity. Custom t-shirts, hoodies, jackets, sportswear and more.',
   meta_keywords: 'custom clothing, clothing manufacturer, t-shirts, hoodies, jackets, sportswear, no MOQ, Sialkot, Pakistan',
+
+  // Footer
+  footer_categories: [],
 }
 
 // Context for global access

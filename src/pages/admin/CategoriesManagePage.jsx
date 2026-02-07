@@ -1,16 +1,26 @@
 import { useState } from 'react'
 import AdminLayout from '../../components/admin/AdminLayout'
-import DataTable from '../../components/admin/DataTable'
+import DataTable, { Pagination } from '../../components/admin/DataTable'
 import Modal, { ModalFooter } from '../../components/common/Modal'
 import Input, { Textarea } from '../../components/common/Input'
 import Button from '../../components/common/Button'
 import ImageUpload from '../../components/common/ImageUpload'
 import { useCategories } from '../../hooks/useCategories'
+import { usePagination } from '../../hooks/usePagination'
 import { getImageUrl } from '../../lib/supabase'
 import { Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react'
 
 export default function CategoriesManagePage() {
   const { categories, loading, createCategory, updateCategory, deleteCategory } = useCategories()
+
+  const {
+    currentPage,
+    totalPages,
+    totalItems,
+    paginatedData: paginatedCategories,
+    goToPage,
+    itemsPerPage,
+  } = usePagination(categories, 15)
 
   const [modalOpen, setModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -142,7 +152,7 @@ export default function CategoriesManagePage() {
         {/* Table */}
         <DataTable
           columns={columns}
-          data={categories}
+          data={paginatedCategories}
           loading={loading}
           emptyMessage="No categories found"
           actions={(row) => (
@@ -162,6 +172,16 @@ export default function CategoriesManagePage() {
             </>
           )}
         />
+
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={goToPage}
+          />
+        )}
 
         {/* Add/Edit Modal */}
         <Modal

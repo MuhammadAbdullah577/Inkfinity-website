@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AdminLayout from '../../components/admin/AdminLayout'
-import DataTable from '../../components/admin/DataTable'
+import DataTable, { Pagination } from '../../components/admin/DataTable'
 import Modal, { ModalFooter } from '../../components/common/Modal'
 import Input, { Textarea, Select } from '../../components/common/Input'
 import Button from '../../components/common/Button'
@@ -11,8 +11,14 @@ import { getImageUrl } from '../../lib/supabase'
 import { Plus, Pencil, Trash2, Image as ImageIcon, X } from 'lucide-react'
 
 export default function ProductsManagePage() {
-  const { products, loading, createProduct, updateProduct, deleteProduct } = useProducts()
+  const { products, loading, pagination, fetchProducts, createProduct, updateProduct, deleteProduct } = useProducts()
   const { categories } = useCategories()
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // Fetch with pagination
+  useEffect(() => {
+    fetchProducts({ page: currentPage, pageSize: 15 })
+  }, [currentPage, fetchProducts])
 
   const [modalOpen, setModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -174,6 +180,16 @@ export default function ProductsManagePage() {
             </>
           )}
         />
+
+        {pagination.totalPages > 1 && (
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.total}
+            itemsPerPage={pagination.pageSize}
+            onPageChange={setCurrentPage}
+          />
+        )}
 
         {/* Add/Edit Modal */}
         <Modal
