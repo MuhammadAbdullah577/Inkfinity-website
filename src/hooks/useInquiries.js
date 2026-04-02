@@ -80,11 +80,9 @@ export function useInquiries() {
 
   const createInquiry = async (inquiryData) => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('contact_inquiries')
         .insert([{ ...inquiryData, read: false }])
-        .select()
-        .single()
 
       if (error) throw error
 
@@ -108,10 +106,10 @@ export function useInquiries() {
         console.error('EmailJS notification failed:', emailError)
       }
 
-      return { data, error: null }
+      return { error: null }
     } catch (err) {
       console.error('Error creating inquiry:', err)
-      return { data: null, error: err }
+      return { error: err }
     }
   }
 
