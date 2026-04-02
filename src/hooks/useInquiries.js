@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import emailjs from '@emailjs/browser'
 
 export function useInquiries() {
   const [inquiries, setInquiries] = useState([])
@@ -86,6 +87,26 @@ export function useInquiries() {
         .single()
 
       if (error) throw error
+
+      // Send email notification (non-blocking)
+      try {
+        await emailjs.send(
+          import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+          {
+            name: inquiryData.name,
+            email: inquiryData.email,
+            phone: inquiryData.phone || 'Not provided',
+            company: inquiryData.company || 'Not provided',
+            product_interest: inquiryData.product_interest || 'Not specified',
+            message: inquiryData.message,
+            time: new Date().toLocaleString(),
+          },
+          import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        )
+      } catch (emailError) {
+        console.error('EmailJS notification failed:', emailError)
+      }
 
       return { data, error: null }
     } catch (err) {
