@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import Layout from '../../components/layout/Layout'
+import SEO from '../../components/seo/SEO'
 import { useCategories } from '../../hooks/useCategories'
 import { usePagination } from '../../hooks/usePagination'
 import { CardSkeleton } from '../../components/common/Loader'
@@ -23,6 +24,11 @@ export default function CategoriesPage() {
 
   return (
     <Layout>
+      <SEO
+        title="Product Categories"
+        description="Explore our custom clothing categories. T-shirts, hoodies, jackets, sportswear, bags, leather products and more. No minimum order quantity."
+        canonical="/categories"
+      />
       {/* Hero Section */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

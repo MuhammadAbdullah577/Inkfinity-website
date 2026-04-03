@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import Header from './Header'
 import Footer from './Footer'
+import WhatsAppButton from '../common/WhatsAppButton'
 import { pageTransition } from '../../animations/variants'
 
 export default function Layout({ children }) {
@@ -17,6 +18,7 @@ export default function Layout({ children }) {
         {children}
       </motion.main>
       <Footer />
+      <WhatsAppButton />
     </div>
   )
 }

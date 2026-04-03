@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import Layout from '../../components/layout/Layout'
+import SEO from '../../components/seo/SEO'
 import { useProducts } from '../../hooks/useProducts'
 import { getImageUrl } from '../../lib/supabase'
+import { getProductSchema, getBreadcrumbSchema } from '../../components/seo/structuredData'
 import Loader from '../../components/common/Loader'
 import { ChevronLeft, ChevronRight, ArrowLeft, MessageCircle } from 'lucide-react'
 
@@ -57,6 +59,21 @@ export default function ProductDetailPage() {
 
   return (
     <Layout>
+      {product && (
+        <SEO
+          title={product.name}
+          description={product.description?.slice(0, 160) || `Custom ${product.name} manufacturing by Inkfinity Creation. No minimum order quantity.`}
+          canonical={`/products/${product.id}`}
+          jsonLd={[
+            getProductSchema(product, product.category?.name),
+            getBreadcrumbSchema([
+              { name: 'Home', url: '/' },
+              { name: 'Products', url: '/products' },
+              { name: product.name },
+            ]),
+          ]}
+        />
+      )}
       <section className="py-16 lg:py-24">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}

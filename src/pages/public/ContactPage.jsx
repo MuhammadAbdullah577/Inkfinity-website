@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import Layout from '../../components/layout/Layout'
+import SEO from '../../components/seo/SEO'
 import Input, { Textarea, Select } from '../../components/common/Input'
 import Button from '../../components/common/Button'
 import { useInquiries } from '../../hooks/useInquiries'
 import { useCategories } from '../../hooks/useCategories'
 import { useCompanySettings } from '../../hooks/useCompanySettings'
+import { getLocalBusinessSchema } from '../../components/seo/structuredData'
 import { Mail, Phone, MapPin, Clock, CheckCircle } from 'lucide-react'
 
 export default function ContactPage() {
@@ -87,6 +89,12 @@ export default function ContactPage() {
 
   return (
     <Layout>
+      <SEO
+        title="Contact Us"
+        description="Get a free quote for custom clothing manufacturing. No minimum order quantity. We respond within 24 hours."
+        canonical="/contact"
+        jsonLd={[getLocalBusinessSchema(settings)]}
+      />
       {/* Hero Section */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

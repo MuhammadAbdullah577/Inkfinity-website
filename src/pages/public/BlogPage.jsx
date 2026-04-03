@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
 import Layout from '../../components/layout/Layout'
+import SEO from '../../components/seo/SEO'
 import BlogCard from '../../components/blog/BlogCard'
 import BlogGrid from '../../components/blog/BlogGrid'
 import { useBlogPosts } from '../../hooks/useBlogPosts'
@@ -23,6 +24,11 @@ export default function BlogPage() {
 
   return (
     <Layout>
+      <SEO
+        title="Blog"
+        description="Insights, tips, and guides on custom clothing manufacturing, fashion trends, and building your clothing brand."
+        canonical="/blog"
+      />
       {/* Hero Section */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

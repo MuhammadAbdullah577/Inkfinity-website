@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
 import Layout from '../../components/layout/Layout'
+import SEO from '../../components/seo/SEO'
 import { staggerContainer, fadeInUp } from '../../animations/variants'
 import {
   Users,
@@ -48,6 +49,11 @@ const capabilities = [
 export default function AboutPage() {
   return (
     <Layout>
+      <SEO
+        title="About Us"
+        description="Learn about Inkfinity Creation - premium custom clothing manufacturer based in Sialkot, Pakistan. 10+ years of excellence, serving 50+ countries worldwide."
+        canonical="/about"
+      />
       {/* Hero Section */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

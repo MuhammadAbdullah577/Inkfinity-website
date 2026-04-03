@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import Layout from '../../components/layout/Layout'
+import SEO from '../../components/seo/SEO'
 import ProductGrid from '../../components/products/ProductGrid'
 import ProductFilters from '../../components/products/ProductFilters'
 import Modal from '../../components/common/Modal'
@@ -66,6 +67,11 @@ export default function ProductGalleryPage() {
 
   return (
     <Layout>
+      <SEO
+        title={selectedCategory ? `${selectedCategory.name} Products` : 'Our Products'}
+        description={selectedCategory ? `Custom ${selectedCategory.name} manufacturing. No minimum order. Get a free quote today.` : 'Browse our full range of custom clothing products. T-shirts, hoodies, jackets, sportswear and more. No MOQ.'}
+        canonical={slug ? `/categories/${slug}` : '/products'}
+      />
       {/* Hero Section */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

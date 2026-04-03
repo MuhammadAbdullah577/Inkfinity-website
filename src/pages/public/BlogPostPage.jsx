@@ -1,9 +1,11 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import Layout from '../../components/layout/Layout'
+import SEO from '../../components/seo/SEO'
 import BlogCard from '../../components/blog/BlogCard'
 import { useBlogPosts } from '../../hooks/useBlogPosts'
 import { getImageUrl } from '../../lib/supabase'
+import { getBlogPostSchema, getBreadcrumbSchema } from '../../components/seo/structuredData'
 import Loader from '../../components/common/Loader'
 import { ArrowLeft, Calendar, Clock } from 'lucide-react'
 
@@ -56,6 +58,23 @@ export default function BlogPostPage() {
 
   return (
     <Layout>
+      {post && (
+        <SEO
+          title={post.title}
+          description={post.excerpt || post.content?.slice(0, 160)}
+          canonical={`/blog/${post.slug}`}
+          ogType="article"
+          ogImage={post.cover_image ? getImageUrl(post.cover_image) : undefined}
+          jsonLd={[
+            getBlogPostSchema(post),
+            getBreadcrumbSchema([
+              { name: 'Home', url: '/' },
+              { name: 'Blog', url: '/blog' },
+              { name: post.title },
+            ]),
+          ]}
+        />
+      )}
       {/* Hero/Cover Image */}
       <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
         <img
